@@ -3,8 +3,8 @@ import java.util.Scanner;
 public class Board {
 	private Scanner sc = new Scanner(System.in);
 
-	String humanLetter = "X";
-	String computerLetter = "O";
+	char humanLetter = 'X';
+	char computerLetter = 'O';
 
 	public Board() {
 		// TODO choose who goes first and what letter they play
@@ -13,25 +13,24 @@ public class Board {
 	public void play(boolean isHumanToPlay) {
 		GameEngine gameEngine = new GameEngine();
 
-		do {
+		while (gameEngine.isStillPlaying()) {
 			System.out.println(gameEngine.getMessage());
-			gameEngine.displayBoard(gameEngine.getMoves());
+			gameEngine.displayBoard();
 
 			if (isHumanToPlay) {
 				String move;
 				do {
 					System.out.println("Enter move:");
 					move = sc.nextLine().toUpperCase();
-				} while (!gameEngine.isValidMove(humanLetter, move));
+				} while (!gameEngine.moveHuman(humanLetter, move));
 			} else {
 				gameEngine.moveAI(computerLetter);
 			}
 
 			isHumanToPlay = !isHumanToPlay;
-
-		} while (gameEngine.isStillPlaying());
+		}
 
 		System.out.println("Finished!!");
-		gameEngine.displayBoard(gameEngine.getMoves());
+		gameEngine.displayBoard();
 	}
 }

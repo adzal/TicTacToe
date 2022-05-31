@@ -1,18 +1,14 @@
 import java.util.ArrayList;
 
 public class GameEngine {
+	private char[] board;
 	private ArrayList<String> validMoves;
-	private ArrayList<Move> moves;
 	private String message = "";
 	private String[] rows = { "A", "B", "C" };
 	private String[] cols = { "1", "2", "3" };
 
 	public ArrayList<String> getValidMoves() {
 		return validMoves;
-	}
-
-	public ArrayList<Move> getMoves() {
-		return moves;
 	}
 
 	public String getMessage() {
@@ -25,34 +21,30 @@ public class GameEngine {
 	}
 
 	public void resetGame() {
-		moves = new ArrayList<>();
 		validMoves = new ArrayList<>();
 
+		String currentBoard = "";
 		for (String row : rows) {
 			for (String col : cols) {
 				validMoves.add(row + col);
+				currentBoard += "_";
 			}
 		}
+//		currentBoard="XXO OOOXX";
+		board = currentBoard.toCharArray();
 	}
 
-	public void moveAI(String letter) {
-		//chose a random location from list of valid moves
+	public void moveAI(char letter) {
+		// chose a random location from list of valid moves
 		int index = (int) (Math.random() * validMoves.size());
-		
 		String selectedMove = validMoves.get(index).toUpperCase();
-		message = "Computer plays " + selectedMove;
 
-		moves.add(new Move(letter, selectedMove));
-
-		validMoves.remove(index);
+		makeMove(letter, selectedMove);
 	}
 
-	public boolean isValidMove(String letter, String move) {
+	public boolean moveHuman(char letter, String move) {
 		if (validMoves.contains(move)) {
-			message = "You play " + move;
-			moves.add(new Move(letter, move));
-			//Move was valid so remove from list of validMoves
-			validMoves.remove(move);
+			makeMove(letter, move);
 			return true;
 		}
 
@@ -61,8 +53,15 @@ public class GameEngine {
 		return false;
 	}
 
+	private void makeMove(char letter, String move) {
+		message = "'" + letter + "' plays " + move;
+		// Move was valid so remove from list of validMoves
+		validMoves.remove(move);
+		updateBoard(letter, move);
+	}
+
 	public boolean isStillPlaying() {
-		if (validMoves.size() > 0 && noWinners()) {
+		if (validMoves.size() > 0 && isNoWinners()) {
 			return true;
 		} else {
 			// If no moves left or someone won Game Over
@@ -71,12 +70,105 @@ public class GameEngine {
 		}
 	}
 
-	private boolean noWinners() {
-		// TODO Enter game to check for winners
+	private boolean isNoWinners() {
+		for (int i = 0; i < board.length; i += cols.length) {
+			if (checkHorizontal(i)) {
+				return false;
+			}
+		}
+
+		for (int i = 0; i < cols.length; i++) {
+			if (checkVertical(i)) {
+				return false;
+			}
+		}
+
+		if (checkDiagonalDown(0)) {
+			return false;
+		}
+
+		if (checkDiagonalUp(2)) {
+			return false;
+		}
+
 		return true;
 	}
 
-	public void displayBoard(ArrayList<Move> moves) {
+	private boolean checkHorizontal(int startPos) {
+		// starting position has an X or O continue if not return
+		if (board[startPos] != 'X' && board[startPos] != 'O') {
+			return false;
+		}
+		// If we match twice then we have 3 in a Row
+		for (int i = 1; i < 3; i++) {
+			if (board[startPos] != board[startPos + i]) {
+				return false;
+			}
+		}
+		System.out.println("checkHorizontal");
+		return true;
+	}
+
+	private boolean checkVertical(int startPos) {
+		// starting position has an X or O continue if not return
+		if (board[startPos] != 'X' && board[startPos] != 'O') {
+			return false;
+		}
+
+		// If we match twice then we have 3 in a Row
+		for (int i = 1; i < 3; i++) {
+			if (board[startPos] != board[startPos + i * cols.length]) {
+				return false;
+			}
+		}
+		System.out.println("checkVertical");
+		return true;
+	}
+
+	private boolean checkDiagonalDown(int startPos) {
+		// starting position has an X or O continue if not return
+		if (board[startPos] != 'X' && board[startPos] != 'O') {
+			return false;
+		}
+
+		// Going diagonally down so it number of columns + 1
+		int index = startPos + cols.length + 1;
+
+		// If we match twice then we have 3 in a Row
+		for (int i = 1; i < 3; i++) {
+			if (board[startPos] != board[index]) {
+				return false;
+			}
+			index += cols.length + 1;
+		}
+		
+		System.out.println("checkDiagonalDown");
+		
+		return true;
+	}
+
+	private boolean checkDiagonalUp(int startPos) {
+		// starting position has an X or O continue if not return
+		if (board[startPos] != 'X' && board[startPos] != 'O') {
+			return false;
+		}
+		
+		// Going diagonally up so it number of columns - 1
+		int index = startPos + cols.length - 1;
+
+		// If we match twice then we have 3 in a Row
+		for (int i = 1; i < 3; i++) {
+			if (board[startPos] != board[index]) {
+				return false;
+			}
+			index += cols.length - 1;
+		}
+		
+		System.out.println("checkDiagonalUp");
+		return true;
+	}
+
+	public void displayBoard() {
 		// Header Row
 		String line = " |";
 		for (String col : cols) {
@@ -84,18 +176,27 @@ public class GameEngine {
 		}
 		System.out.println(line);
 
+		int index = 0;
 		for (String row : rows) {
 			line = row + "|";
-			for (String col : cols) {
-				String location = row + col;
-				var result = moves.stream().filter(t -> t.location.equals(location)).findAny().orElse(null);
-				if (result == null) {
-					line += "_|";
-				} else {
-					line += result.letter + "|";
-				}
+			for (int i = 0; i < cols.length; i++) {
+				line += board[index++] + "|";
 			}
 			System.out.println(line);
+		}
+	}
+
+	public void updateBoard(char letter, String move) {
+		//Add the move to the board
+		int index = 0;
+		for (String row : rows) {
+			for (String col : cols) {
+				// here is the move set the letter to the letter played
+				if (move.equals(row + col)) {
+					board[index] = letter;
+				}
+				index++;
+			}
 		}
 	}
 }
