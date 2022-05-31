@@ -35,17 +35,16 @@ public class GameEngine {
 		}
 	}
 
-	public String move(String letter) {
+	public void moveAI(String letter) {
 		//chose a random location from list of valid moves
 		int index = (int) (Math.random() * validMoves.size());
+		
 		String selectedMove = validMoves.get(index).toUpperCase();
 		message = "Computer plays " + selectedMove;
 
 		moves.add(new Move(letter, selectedMove));
 
 		validMoves.remove(index);
-
-		return selectedMove;
 	}
 
 	public boolean isValidMove(String letter, String move) {
@@ -63,7 +62,7 @@ public class GameEngine {
 	}
 
 	public boolean isStillPlaying() {
-		if (validMoves.size() > 0 || noWinners()) {
+		if (validMoves.size() > 0 && noWinners()) {
 			return true;
 		} else {
 			// If no moves left or someone won Game Over

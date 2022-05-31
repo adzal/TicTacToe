@@ -7,7 +7,7 @@ public class Board {
 	String computerLetter = "O";
 
 	public Board() {
-		//TODO choose who goes first and what letter they play
+		// TODO choose who goes first and what letter they play
 	}
 
 	public void play(boolean isHumanToPlay) {
@@ -17,14 +17,14 @@ public class Board {
 			System.out.println(gameEngine.getMessage());
 			gameEngine.displayBoard(gameEngine.getMoves());
 
-			String move = "";
 			if (isHumanToPlay) {
+				String move;
 				do {
 					System.out.println("Enter move:");
 					move = sc.nextLine().toUpperCase();
 				} while (!gameEngine.isValidMove(humanLetter, move));
 			} else {
-				move = gameEngine.move(computerLetter);
+				gameEngine.moveAI(computerLetter);
 			}
 
 			isHumanToPlay = !isHumanToPlay;
