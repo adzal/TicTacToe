@@ -7,10 +7,27 @@ public class Board {
 	char computerLetter = 'O';
 
 	public Board() {
-		// TODO choose who goes first and what letter they play
 	}
 
 	public void play(boolean isHumanToPlay) {
+		// TODO choose who goes first and what letter they play
+		boolean isContinue = true;
+		while (isContinue) {
+			System.out.println("Do you want to play as 'X' or 'O'");
+			String letter = sc.nextLine().toUpperCase();
+			if (letter.startsWith("X")) {
+				humanLetter = 'X';
+				computerLetter = 'O';
+			} else if (letter.startsWith("O")) {
+				humanLetter = 'O';
+				computerLetter = 'X';
+			} else {
+				System.out.println("Invalie input, try again");
+				continue;
+			}
+			isContinue = false;
+		}
+
 		GameEngine gameEngine = new GameEngine();
 
 		while (gameEngine.isStillPlaying()) {
