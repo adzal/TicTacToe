@@ -98,7 +98,7 @@ public class GameEngine {
 
 				boolean isMax = true;
 				int score = minmax(depth + 1, !isMax);
-				gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
+				//gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
 
 				if (score > bestScore) {
 					bestScore = score;
@@ -136,7 +136,7 @@ public class GameEngine {
 					board[i] = isMax ? aiPlayer : humanPlayer;
 
 					score = minmax(depth + 1, !isMax);
-					gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
+					//gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
 
 					if (isMax) {
 						bestScore = Math.max(bestScore, score);
@@ -257,22 +257,28 @@ public class GameEngine {
 
 	/**
 	 * Returns the 'X' or 'O' if a winner or '0' if no winner
-	 * 
-	 * For Diagonal up it adds cols.width-1
-	 * 
+	 *  
 	 * given columns A,B&C cols.width=3, board is a simple array 0 to 8
 	 * 
 	 * to see if Three in a row we just
 	 * 
-	 * For horizontal it add +1 if x==x+1 && x+1==x+2 X X X
+	 * For horizontal it add +1 if x==x+1 && x+1==x+2 
+	 * X X X
 	 * 
-	 * For Vertical it adds cols.width if x==x+3 && x+3==x+6 X _ _ X _ _ X _ _
+	 * For Vertical it adds cols.width if x==x+3 && x+3==x+6 
+	 * X _ _ 
+	 * X _ _ 
+	 * X _ _
 	 * 
-	 * For Diagonal down it adds cols.width+1 if x==x+4 && x+4==x+8 X _ _ _ X _ _ _
-	 * X
+	 * For Diagonal down it adds cols.width+1 if x==x+4 && x+4==x+8 
+	 * X _ _ 
+	 * _ X _ 
+	 * _ _ X
 	 * 
-	 * For Diagonal up it starts at the 3rd col and adds 2 if x==x+2 && x+2==x+4 _ _
-	 * X _ X _ X _ _
+	 * For Diagonal up it starts at the 3rd col and adds 2 if x==x+2 && x+2==x+4 
+	 * _ _ X
+	 * _ X _
+	 * X _ _
 	 * 
 	 * @param startPos
 	 * @param width
