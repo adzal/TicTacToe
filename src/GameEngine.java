@@ -33,7 +33,7 @@ public class GameEngine {
 				s += "_";
 			}
 		}
-//		s = "XXO_O____";
+//		s = "OXO_X_XOO";
 		board = s.toCharArray();
 	}
 
@@ -109,9 +109,9 @@ public class GameEngine {
 		}
 
 		// If you want to visualise the tree uncomment
-		// Collections.sort(gameNodes);
-		// System.out.println("After Sort");
-		// System.out.println(gameNodes);
+//		Collections.sort(gameNodes);
+//		System.out.println("After Sort");
+//		System.out.println(gameNodes);
 
 		System.out.println("AI plays " + moveToString(bestMove));
 		makeMove(aiPlayer, bestMove);
@@ -126,7 +126,7 @@ public class GameEngine {
 			bestScore = score - depth;
 		} else if (score == -10) {
 			bestScore = score + depth;
-		} else if (depth == 8) {
+		} else if (depth == 9) {
 			bestScore = 0;
 		} else {
 			// Loop through all the child moves recursively

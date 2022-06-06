@@ -34,12 +34,12 @@ public class Board {
 
 		while (true) {
 			gameEngine.resetGame();
-
+			boolean nextPlayer = isHumanToPlay;
 			while (gameEngine.isStillPlaying()) {
 				System.out.println(gameEngine.getMessage());
 				gameEngine.displayBoard();
 
-				if (isHumanToPlay) {
+				if (nextPlayer) {
 					String move;
 					do {
 						System.out.println("Your turn, make move:");
@@ -50,7 +50,7 @@ public class Board {
 					gameEngine.moveAI();
 				}
 
-				isHumanToPlay = !isHumanToPlay;
+				nextPlayer = !nextPlayer;
 			}
 
 			gameEngine.displayBoard();
@@ -72,6 +72,8 @@ public class Board {
 			if (line.charAt(0) == 'N') {
 				break;
 			}
+			isHumanToPlay = !isHumanToPlay;
+
 		}
 	}
 }
