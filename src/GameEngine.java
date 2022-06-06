@@ -170,7 +170,7 @@ public class GameEngine {
 	public boolean moveHuman(String move) {
 		Integer i = moveFromString(move);
 		//If a valid cell and is empty then make move
-		if (i > 0 && board[i] == EMPTY_CELL) {
+		if (i >= 0 && board[i] == EMPTY_CELL) {
 			makeMove(humanPlayer, i);
 			return true;
 		}
