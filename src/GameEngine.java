@@ -5,9 +5,10 @@ public class GameEngine {
 	private char[] board;
 	final char EMPTY_CELL = '_';
 	ArrayList<GameNode> gameNodes = new ArrayList<GameNode>();
-
 	private char humanPlayer;
 	private char aiPlayer;
+	static int minimaxCalls = 0;// Minimax called 549945 no alpha beta pruning
+								// Minimax called  34202 times with pruning.
 
 	private String message = "";
 	private static String[] rows = { "A", "B", "C" };
@@ -88,17 +89,20 @@ public class GameEngine {
 	public void moveAI() {
 		// chose a random location from list of valid moves
 		int bestScore = -1000;
+		int alpha=-1000;
+		int beta=1000;
+		
 		int bestMove = 0;
-
 		// set depth if we're starting partially filled in resetGame()
 		int depth = currentDepth();
+		minimaxCalls = 0;
 		for (int i = 0; i < board.length; i++) {
 			if (board[i] == EMPTY_CELL) {
 				board[i] = aiPlayer;
 
 				boolean isMax = true;
-				int score = minmax(depth + 1, !isMax);
-				//gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
+				int score = minmax(depth + 1, !isMax, alpha, beta);
+//				gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
 
 				if (score > bestScore) {
 					bestScore = score;
@@ -107,6 +111,7 @@ public class GameEngine {
 				board[i] = EMPTY_CELL;
 			}
 		}
+		System.out.println("Minimax called " + minimaxCalls + "times.");
 
 		// If you want to visualise the tree uncomment
 //		Collections.sort(gameNodes);
@@ -117,39 +122,44 @@ public class GameEngine {
 		makeMove(aiPlayer, bestMove);
 	}
 
-	private int minmax(int depth, boolean isMax) {
-		int bestScore = isMax ? -1000 : 1000;
-
+	private int minmax(int depth, boolean isMax, int alpha, int beta) {
+		minimaxCalls++;
+		int value = isMax ? -1000 : 1000;
 		// Get score for this position
 		int score = evaluateBoard();
 		if (score == 10) {
-			bestScore = score - depth;
+			value = score - depth;
 		} else if (score == -10) {
-			bestScore = score + depth;
+			value = score + depth;
 		} else if (depth == 9) {
-			bestScore = 0;
+			value = 0;
 		} else {
 			// Loop through all the child moves recursively
 			for (int i = 0; i < board.length; i++) {
 				if (board[i] == EMPTY_CELL) {
 					// Make passed move
 					board[i] = isMax ? aiPlayer : humanPlayer;
-
-					score = minmax(depth + 1, !isMax);
-					//gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
-
-					if (isMax) {
-						bestScore = Math.max(bestScore, score);
-					} else {
-						bestScore = Math.min(bestScore, score);
-					}
-
+					score = minmax(depth + 1, !isMax, alpha, beta);
+//					gameNodes.add(new GameNode(moveToString(i), i, depth, board.clone(), score, isMax));
 					// Reset board
 					board[i] = EMPTY_CELL;
+
+					if (isMax) {
+						value = Math.max(value, score);
+						alpha = Math.max(alpha, score);
+						if (score >= beta)
+							break;
+					} else {
+						value = Math.min(value, score);
+						beta = Math.min(beta, score);
+						if (score <= alpha)
+							break;
+					}
+
 				}
 			}
 		}
-		return bestScore;
+		return value;
 	}
 
 	private int evaluateBoard() {
@@ -164,12 +174,13 @@ public class GameEngine {
 
 	/**
 	 * Check if the cell is valid and empty, if so makes that move
+	 * 
 	 * @param move
 	 * @return if move is valid
 	 */
 	public boolean moveHuman(String move) {
 		Integer i = moveFromString(move);
-		//If a valid cell and is empty then make move
+		// If a valid cell and is empty then make move
 		if (i >= 0 && board[i] == EMPTY_CELL) {
 			makeMove(humanPlayer, i);
 			return true;
@@ -181,13 +192,13 @@ public class GameEngine {
 	}
 
 	/**
-	 * Translates the index 0->8 into a nice string e.g. 
-	 * cell 0 is A1 cell 8 is C3
+	 * Translates the index 0->8 into a nice string e.g. cell 0 is A1 cell 8 is C3
+	 * 
 	 * @param move
 	 * @return index of cell or -1 if not found
 	 */
 	private int moveFromString(String move) {
-		int index = 0;		
+		int index = 0;
 		for (int i = 0; i < cols.length; i++) {
 			for (int j = 0; j < rows.length; j++) {
 				if (move.equals(rows[i] + cols[j])) {
@@ -257,28 +268,20 @@ public class GameEngine {
 
 	/**
 	 * Returns the 'X' or 'O' if a winner or '0' if no winner
-	 *  
+	 * 
 	 * given columns A,B&C cols.width=3, board is a simple array 0 to 8
 	 * 
 	 * to see if Three in a row we just
 	 * 
-	 * For horizontal it add +1 if x==x+1 && x+1==x+2 
-	 * X X X
+	 * For horizontal it add +1 if x==x+1 && x+1==x+2 X X X
 	 * 
-	 * For Vertical it adds cols.width if x==x+3 && x+3==x+6 
-	 * X _ _ 
-	 * X _ _ 
-	 * X _ _
+	 * For Vertical it adds cols.width if x==x+3 && x+3==x+6 X _ _ X _ _ X _ _
 	 * 
-	 * For Diagonal down it adds cols.width+1 if x==x+4 && x+4==x+8 
-	 * X _ _ 
-	 * _ X _ 
-	 * _ _ X
+	 * For Diagonal down it adds cols.width+1 if x==x+4 && x+4==x+8 X _ _ _ X _ _ _
+	 * X
 	 * 
-	 * For Diagonal up it starts at the 3rd col and adds 2 if x==x+2 && x+2==x+4 
-	 * _ _ X
-	 * _ X _
-	 * X _ _
+	 * For Diagonal up it starts at the 3rd col and adds 2 if x==x+2 && x+2==x+4 _ _
+	 * X _ X _ X _ _
 	 * 
 	 * @param startPos
 	 * @param width
