@@ -199,8 +199,8 @@ public class GameEngine {
 	 */
 	private int moveFromString(String move) {
 		int index = 0;
-		for (int i = 0; i < cols.length; i++) {
-			for (int j = 0; j < rows.length; j++) {
+		for (int i = 0; i < rows.length; i++) {
+			for (int j = 0; j < cols.length; j++) {
 				if (move.equals(rows[i] + cols[j])) {
 					return index;
 				}
@@ -212,8 +212,8 @@ public class GameEngine {
 
 	private String moveToString(int move) {
 		int index = 0;
-		for (int i = 0; i < cols.length; i++) {
-			for (int j = 0; j < rows.length; j++) {
+		for (int i = 0; i < rows.length; i++) {
+			for (int j = 0; j < cols.length; j++) {
 				if (index == move) {
 					return rows[i] + cols[j];
 				}
